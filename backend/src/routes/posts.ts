@@ -14,12 +14,30 @@ const PostsSchemaZod = z.object({
    userId: z.number(),
    title: z.string(),
    Content: z.string(),
+   tags : z.string().array()
 });
+
 
 type PostsSchema = z.infer<typeof PostsSchemaZod>;
 type AllpostsType = Pick<PostsSchema,'title'>;
-type SinglePostSchema = Pick<PostsSchema,'title' | 'Content'>;
+type SinglePostSchema = Pick<PostsSchema,'title' | 'Content' | 'tags'>;
 type BodyType = Pick<PostsSchema,'title' | 'Content' | 'userId'>
+
+
+PostsRouter.get('/get',async (req:Request,res:Response) => {
+   const Id = req.body as string;
+   await prisma.users.findFirst({
+      where:{
+         id:Number(Id),
+         posts:{
+            some:{
+               
+            }
+         }
+      }
+
+   })
+})
 
 PostsRouter.get('/yourposts',async (req:CustomRequest,res:Response) => {
    const Id = req.id as string;
@@ -52,12 +70,13 @@ PostsRouter.post('/',authMiddleware,async (req:CustomRequest,res:Response) => {
          message : "not number"
       })
    }
-   const {title,Content}:SinglePostSchema = req.body;
+   const {title,Content,tags}:SinglePostSchema = req.body;
    const NewPost:AllpostsType = await prisma.posts.create({
       data:{
          userId:Id,
          title:title,
-         Content:Content
+         Content:Content,
+         tags:tags
       },
       select:{
          title:true
@@ -68,25 +87,34 @@ PostsRouter.post('/',authMiddleware,async (req:CustomRequest,res:Response) => {
    })
 })
 
-PostsRouter.get('/:id',authMiddleware,async (req:Request,res:Response) => {
+PostsRouter.get('/:id',authMiddleware,async (req:CustomRequest,res:Response) => {
    const id = req.params.id as string;
-   const post:SinglePostSchema | null = await prisma.posts.findFirst({
-      select:{
-         title:true,
-         Content:true
-      },
+   const Id = req.id as string;
+   const post = await prisma.users.findFirst({
       where:{
-         id:Number(id)
+         id:Number(Id)
+      },
+      select: {
+         posts: {
+           where: {
+             id: Number(id)
+           },
+           select: {
+             id: true,
+             title: true,
+             Content: true,
+             tags: true
+           }
+         }
       }
-   })
+   });
    if(!post){
       return res.json({
          message : "post doesn't exist"
       })
    }
    return res.json({
-      title : post.title,
-      Content:post.Content
+      post : post.posts
    })
 })
 

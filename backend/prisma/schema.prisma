@@ -27,5 +27,6 @@ model Posts{
   userId    Int   
   title     String
   Content   String
+  tags      String[]  
   user      Users   @relation(fields: [userId],references: [id])
 }
