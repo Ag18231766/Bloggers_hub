@@ -24,20 +24,7 @@ type SinglePostSchema = Pick<PostsSchema,'title' | 'Content' | 'tags'>;
 type BodyType = Pick<PostsSchema,'title' | 'Content' | 'userId'>
 
 
-PostsRouter.get('/get',async (req:Request,res:Response) => {
-   const Id = req.body as string;
-   await prisma.users.findFirst({
-      where:{
-         id:Number(Id),
-         posts:{
-            some:{
-               
-            }
-         }
-      }
 
-   })
-})
 
 PostsRouter.get('/yourposts',async (req:CustomRequest,res:Response) => {
    const Id = req.id as string;
