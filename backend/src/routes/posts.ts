@@ -1,6 +1,6 @@
 import express,{Request,Response} from 'express';
 import { CustomRequest, authMiddleware } from '../middleware';
-import { PrismaClient } from '@prisma/client';
+import { Posts, PrismaClient } from '@prisma/client';
 import z, { number } from 'zod';
 import StatusCodes from '../StatusCodes';
 
@@ -19,6 +19,7 @@ const PostsSchemaZod = z.object({
 
 
 type PostsSchema = z.infer<typeof PostsSchemaZod>;
+type UserPostsSchema = Pick<PostsSchema,'id'|'userId'|'title'|'Content'>;
 type AllpostsType = Pick<PostsSchema,'title'>;
 type SinglePostSchema = Pick<PostsSchema,'title' | 'Content' | 'tags'>;
 type BodyType = Pick<PostsSchema,'title' | 'Content' | 'userId'>
@@ -26,14 +27,15 @@ type BodyType = Pick<PostsSchema,'title' | 'Content' | 'userId'>
 
 
 
-PostsRouter.get('/yourposts',async (req:CustomRequest,res:Response) => {
+PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Response) => {
    const Id = req.id as string;
-   const UserPosts:AllpostsType[] = await prisma.posts.findMany({
+   
+   const UserPosts:{posts:UserPostsSchema[]} | null = await prisma.users.findFirst({
       where:{
-         userId:Number(Id)
+         id:Number(Id)
       },
       select:{
-         title:true
+         posts:true
       }
    })
 

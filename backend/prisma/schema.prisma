@@ -27,6 +27,13 @@ model Posts{
   userId    Int   
   title     String
   Content   String
-  tags      String[]  
+  tags      Tags[] 
   user      Users   @relation(fields: [userId],references: [id])
+}
+
+model Tags {
+  id       Int     @unique @default(autoincrement())
+  title    String  
+  postId   Int
+  post     Posts   @relation(fields: [postId],references: [id])
 }
