@@ -21,7 +21,7 @@ UserRouter.use(express.json());
 const SignUpUserSchema = z.object({
    id : z.number(),
    email : z.string().email(),
-   userName : z.string(),
+   username : z.string(),
    password : z.string().min(8)
 })
 const SignInUserSchema = SignUpUserSchema.pick({'email':true,'password':true})
@@ -58,9 +58,9 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
          message : "either email doesn't exist or password isn't of 8 characters"
       })
    }
-   const {userName,email,password} = req.body;
+   const {username,email,password} = req.body;
    
-   const UserExist:SignUpUserSchemaType | null = await prisma.users.findFirst({
+   const UserExist:SignUpUserSchemaType | null = await prisma.user.findFirst({
       where : {
          email:email
       }
@@ -71,9 +71,9 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
          message: "User with these credentials already exits"
       })
    }
-   const newUser:NewUserType = await prisma.users.create({
+   const newUser:NewUserType = await prisma.user.create({
       data:{
-         userName,
+         username,
          email,
          password
       },
@@ -98,7 +98,7 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
          message : 'id not defined'
       })
    }
-   const UserExist:NewUserType | null = await prisma.users.findFirst({
+   const UserExist:NewUserType | null = await prisma.user.findFirst({
       where:{
          id:Number(Id)
       },
@@ -119,7 +119,7 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
 UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
    const {email,password}:SignInUserSchema = req.body;
    console.log(req.body);
-   const UserExist:NewUserType | null = await prisma.users.findFirst({
+   const UserExist:NewUserType | null = await prisma.user.findFirst({
       where:{
          email:email,
          password:password

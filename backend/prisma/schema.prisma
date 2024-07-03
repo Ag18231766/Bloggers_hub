@@ -12,28 +12,43 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-model Users{
-  id        Int   @unique @default(autoincrement())
-  email     String  @unique
-  userName  String  @unique
-  password  String 
-  posts     Posts[] 
+model User {
+  id       Int      @id @default(autoincrement())
+  username String
+  email    String
+  password String
+  posts    Posts[]
 }
 
-
-model Posts{
-  id        Int    @unique @default(autoincrement())
-  userId    Int   
+model Posts {
+  id        Int      @id @default(autoincrement())
   title     String
-  Content   String
-  tags      Tags[] 
-  user      Users   @relation(fields: [userId],references: [id])
+  body      String
+  userId    Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  tags      PostTag[]
 }
 
 model Tags {
-  id       Int     @unique @default(autoincrement())
-  title    String  
-  postId   Int
-  post     Posts   @relation(fields: [postId],references: [id])
+  id  Int    @id @default(autoincrement())
+  tag String @unique
+  posts PostTag[]
+  admin  Admin   @relation(fields: [adminId],references: [id])
+  adminId Int 
+}
+
+model PostTag {
+  id     Int   @id @default(autoincrement())
+  postId Int
+  tagId  Int
+  post   Posts @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tags  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+}
+
+model Admin{
+  id   Int   @id @default(autoincrement())
+  name String
+  password  String
+  tag  Tags[]
 }
