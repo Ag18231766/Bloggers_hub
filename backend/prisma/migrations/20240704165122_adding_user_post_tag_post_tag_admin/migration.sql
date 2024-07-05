@@ -23,6 +23,7 @@ CREATE TABLE "Posts" (
 CREATE TABLE "Tags" (
     "id" SERIAL NOT NULL,
     "tag" TEXT NOT NULL,
+    "adminId" INTEGER NOT NULL,
 
     CONSTRAINT "Tags_pkey" PRIMARY KEY ("id")
 );
@@ -36,11 +37,23 @@ CREATE TABLE "PostTag" (
     CONSTRAINT "PostTag_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Admin" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+
+    CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Tags_tag_key" ON "Tags"("tag");
 
 -- AddForeignKey
 ALTER TABLE "Posts" ADD CONSTRAINT "Posts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Tags" ADD CONSTRAINT "Tags_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "Admin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PostTag" ADD CONSTRAINT "PostTag_postId_fkey" FOREIGN KEY ("postId") REFERENCES "Posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
