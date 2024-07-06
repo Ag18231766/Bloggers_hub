@@ -5,6 +5,7 @@ import StatusCodes from '../StatusCodes';
 import { PrismaClient } from '@prisma/client';
 import JWT_PASSWORD from '../config';
 import { CustomRequest, UserPayload, authMiddleware } from '../middleware';
+import { STATUS_CODES } from 'http';
 
 
 
@@ -43,11 +44,7 @@ type NewUserType = Pick<SignUpUserSchemaType,"id">;
 // routehandlers
 
 
-UserRouter.get('/',(req,res) => {
-   return res.json({
-      message : "hello from userRouter"
-   })
-})
+
 
 UserRouter.post('/signup',async (req:Request,res:Response)=> {
    
@@ -59,34 +56,43 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
       })
    }
    const {username,email,password} = req.body;
-   
-   const UserExist:SignUpUserSchemaType | null = await prisma.user.findFirst({
-      where : {
-         email:email
+
+   try{
+      const UserExist:SignUpUserSchemaType | null = await prisma.user.findFirst({
+         where : {
+            email:email
+         }
+      })
+      
+      if(UserExist){
+         return res.status(StatusCodes.CONFLICT).json({
+            message: "User with these credentials already exits"
+         })
       }
-   })
-   
-   if(UserExist){
-      return res.status(StatusCodes.CONFLICT).json({
-         message: "User with these credentials already exits"
+      const newUser:NewUserType = await prisma.user.create({
+         data:{
+            username,
+            email,
+            password
+         },
+         select:{
+            id:true
+         }
+      })
+      const payload: UserPayload = { id: newUser.id.toString() };
+      const token = jwt.sign(payload, JWT_PASSWORD);
+      
+      return res.json({
+         token : token
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+         mesage : "database is not up"
       })
    }
-   const newUser:NewUserType = await prisma.user.create({
-      data:{
-         username,
-         email,
-         password
-      },
-      select:{
-         id:true
-      }
-   })
-   const payload: UserPayload = { id: newUser.id.toString() };
-   const token = jwt.sign(payload, JWT_PASSWORD);
    
-   return res.json({
-      token : token
-   })
+   
 })
 
 
@@ -98,45 +104,60 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
          message : 'id not defined'
       })
    }
-   const UserExist:NewUserType | null = await prisma.user.findFirst({
-      where:{
-         id:Number(Id)
-      },
-      select:{
-         id:true
+   try{
+      const UserExist:NewUserType | null = await prisma.user.findFirst({
+         where:{
+            id:Number(Id)
+         },
+         select:{
+            id:true
+         }
+      })
+      if(!UserExist){
+         return res.status(StatusCodes.NOT_FOUND).json({
+            message : "user doesn't exist"
+         })
       }
-   })
-   if(!UserExist){
-      return res.status(StatusCodes.NOT_FOUND).json({
-         message : "user doesn't exist"
+      const token = jwt.sign({id:Id},JWT_PASSWORD);
+      return res.json({
+         token : token
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+         mesage : "database is not up"
       })
    }
-   const token = jwt.sign({id:Id},JWT_PASSWORD);
-   return res.json({
-      token : token
-   })
+   
 })
 UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
    const {email,password}:SignInUserSchema = req.body;
-   console.log(req.body);
-   const UserExist:NewUserType | null = await prisma.user.findFirst({
-      where:{
-         email:email,
-         password:password
-      },
-      select:{
-         id:true
+   try{
+      const UserExist:NewUserType | null = await prisma.user.findFirst({
+         where:{
+            email:email,
+            password:password
+         },
+         select:{
+            id:true
+         }
+      })
+      if(!UserExist){
+         return res.json({
+            message : "user doesn't exist"
+         })
       }
-   })
-   if(!UserExist){
+      const token = jwt.sign({id:UserExist.id},JWT_PASSWORD);
       return res.json({
-         message : "user doesn't exist"
+         token : token
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+         mesage : "database is not up"
       })
    }
-   const token = jwt.sign({id:UserExist.id},JWT_PASSWORD);
-   return res.json({
-      token : token
-   })
+   
 
 })
 

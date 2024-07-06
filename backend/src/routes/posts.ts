@@ -31,25 +31,42 @@ type BodyType = Pick<PostsSchema,'title' | 'body' | 'userId'>
 PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Response) => {
    const Id = req.id as string;
 
-   const UserPosts:{posts:UserPostsSchema[]} | null = await prisma.user.findFirst({
-      where:{
-         id:Number(Id)
-      },
-      select:{
-         posts:true
-      }
-   })
+   try{
+      const UserPosts:{posts:UserPostsSchema[]} | null = await prisma.user.findFirst({
+         where:{
+            id:Number(Id)
+         },
+         select:{
+            posts:true
+         }
+      })
+   
+      return res.json({
+         userposts : UserPosts
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+          message : "can't connect to database"
+      })
+   }
 
-   return res.json({
-      userposts : UserPosts
-   })
+   
 })
 
 PostsRouter.get('/allposts',authMiddleware,async (req:Request,res:Response) => {
-   const AllPosts:AllpostsType[] = await prisma.posts.findMany();
-   return res.json({
-      posts : AllPosts
-   })
+   
+   try{
+      const AllPosts:AllpostsType[] = await prisma.posts.findMany();
+      return res.json({
+         posts : AllPosts
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+          message : "can't connect to database"
+      })
+   }
 })
 
 PostsRouter.post('/',authMiddleware,async (req:CustomRequest,res:Response) => {
@@ -61,144 +78,158 @@ PostsRouter.post('/',authMiddleware,async (req:CustomRequest,res:Response) => {
       })
    }
 
-   const AvailableTags = await prisma.tags.findMany();
-   const {title,body,tags}:SinglePostSchema = req.body;
-   const TagsNeeded = AvailableTags.filter(t => {
-         return tags.includes(t.tag);
-   })
-   // const AllPosts = await prisma.posts.findMany();
-   const newPost = await prisma.posts.create({
-      data: {
-         title,
-         body,
-         user: {
-            connect: {
-               id: Number(Id)
-            },
-         },
-         tags: {
-            create: TagsNeeded.map(t => ({
-               tag: {
-                 connect: {
-                   id: t.id,
-                 },
+   try{
+      const AvailableTags = await prisma.tags.findMany();
+      const {title,body,tags}:SinglePostSchema = req.body;
+      const TagsNeeded = AvailableTags.filter(t => {
+            return tags.includes(t.tag);
+      })
+      const newPost = await prisma.posts.create({
+         data: {
+            title,
+            body,
+            user: {
+               connect: {
+                  id: Number(Id)
                },
-            })),
-        },
-      },
-      include:{
-         tags:true
-      }
-   });
-   // await prisma.tags.create({
-   //    data:{
-   //       tag: "sdlfc",
-   //       adminId:1,
-   //       posts:{
-   //          create : AllPosts.map(t => ({
-   //             post:{
-   //                connect:{
-   //                   id : t.id
-   //                }
-   //             }
-   //          }))
-   //       }
-   //    }
-   // })
-
+            },
+            tags: {
+               create: TagsNeeded.map(t => ({
+                  tag: {
+                    connect: {
+                      id: t.id,
+                    },
+                  },
+               })),
+           },
+         },
+         include:{
+            tags:true
+         }
+      });
    
-
-   res.status(StatusCodes.OK).json({
-      title: newPost.title
-   })
+      res.status(StatusCodes.OK).json({
+         title: newPost.title
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+          message : "can't connect to database"
+      })
+   }
+   
 })
 
 PostsRouter.get('/:filter',authMiddleware,async (req:CustomRequest,res:Response) => {
    const filter = req.params.filter as string;
    const Id = req.id as string;
-   const post = await prisma.user.findFirst({
-      where:{
-         id:Number(Id)
-      },
-      select: {
-         posts: {
-           where: {
-            title:{
-               contains: filter
+   try{
+      const post = await prisma.user.findFirst({
+         where:{
+            id:Number(Id)
+         },
+         select: {
+            posts: {
+              where: {
+               title:{
+                  contains: filter
+               }
+              },
+              select: {
+                id: true,
+                title: true,
+                body: true,
+                tags: true
+              }
             }
-           },
-           select: {
-             id: true,
-             title: true,
-             body: true,
-             tags: true
-           }
          }
+      });
+      if(!post){
+         return res.json({
+            message : "post doesn't exist"
+         })
       }
-   });
-   if(!post){
       return res.json({
-         message : "post doesn't exist"
+         post : post.posts
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+          message : "can't connect to database"
       })
    }
-   return res.json({
-      post : post.posts
-   })
+   
 })
 
 PostsRouter.put('/:postid',authMiddleware,async (req:CustomRequest,res:Response) => {
    const id = req.params.postid as string;
    const {title,body}:BodyType = req.body;
    const Id = req.id as string;
-   const PostToUpdate = await prisma.posts.update({
-      where:{
-         id:Number(id),
-         userId:Number(Id)
-      },
-      data:{
-         title,
-         body
+   try{
+      const PostToUpdate = await prisma.posts.update({
+         where:{
+            id:Number(id),
+            userId:Number(Id)
+         },
+         data:{
+            title,
+            body
+         }
+        
+      })
+      if(!PostToUpdate){
+         return res.json({
+            message : "post doesn't exist"
+         })
       }
-     
-   })
-   if(!PostToUpdate){
       return res.json({
-         message : "post doesn't exist"
+         title : PostToUpdate.title,
+         body:PostToUpdate.body
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+          message : "can't connect to database"
       })
    }
-   return res.json({
-      title : PostToUpdate.title,
-      body:PostToUpdate.body
-   })
+   
 })
 
 PostsRouter.delete('/:postid',authMiddleware,async (req:CustomRequest,res:Response) => {
    const Id = req.id as string;
    const id = req.params.postid as string;
-   const IsOwner:UserPostsSchema | null = await prisma.posts.findFirst({
-      where:{
-         userId:{
-            equals:Number(Id)
+   try{
+      const IsOwner:UserPostsSchema | null = await prisma.posts.findFirst({
+         where:{
+            userId:{
+               equals:Number(Id)
+            },
+            id:{
+               equals:Number(id)
+            }
          },
-         id:{
-            equals:Number(id)
+      })
+      if(!IsOwner){
+         return res.json({
+            message : `you are the owner of the post with postId ${id}`
+         })
+      }
+      await prisma.posts.delete({
+         where:{
+            id:Number(id),
+            userId:Number(Id)
          }
-      },
-   })
-   if(!IsOwner){
+      })
       return res.json({
-         message : `you are the owner of the post with postId ${id}`
+         message : "post deleted successfully"
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+          message : "can't connect to database"
       })
    }
-   await prisma.posts.delete({
-      where:{
-         id:Number(id),
-         userId:Number(Id)
-      }
-   })
-   return res.json({
-      message : "post deleted successfully"
-   })
+   
 })
 
 export default PostsRouter;
