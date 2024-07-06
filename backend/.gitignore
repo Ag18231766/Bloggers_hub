@@ -1,7 +1,7 @@
 node_modules
 README.md
 read_me.md
-dist
+
 temp.ts
 # Keep environment variables out of version control
 .env
