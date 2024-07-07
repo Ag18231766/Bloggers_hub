@@ -6,15 +6,15 @@ import jwt from "jsonwebtoken";
 import StatusCodes from '../StatusCodes';
 import JWT_PASSWORD from '../config';
 import { STATUS_CODES } from 'http';
+import {AdminZod} from "@amartya_gupta/medium_type";
 const TagRouter = express.Router();
 TagRouter.use(express.json());
 
 const prisma = new PrismaClient();
 
-const AdminZod = z.object({
-    name:z.string(),
-    password:z.string().min(8)
-});
+
+
+type AdminZodType = z.infer<typeof AdminZod>;
 
 TagRouter.post("/signin",async (req:Request,res:Response) => {
     const {success} = AdminZod.safeParse(req.body);
@@ -23,7 +23,7 @@ TagRouter.post("/signin",async (req:Request,res:Response) => {
             message : "admin credential invalid"
         })
     }
-    const {name,password} = req.body;
+    const {name,password}:AdminZodType = req.body;
     try{
         const AdminExist = await prisma.admin.findFirst({
             where:{

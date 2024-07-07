@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 import JWT_PASSWORD from '../config';
 import { CustomRequest, UserPayload, authMiddleware } from '../middleware';
 import { STATUS_CODES } from 'http';
-
+import {SignUpUserSchema,SignInUserSchema} from '@amartya_gupta/medium_type';
 
 
 const UserRouter = express.Router();
@@ -17,24 +17,17 @@ const prisma = new PrismaClient();
 UserRouter.use(express.json());
 
 
-// zod definitions
 
-const SignUpUserSchema = z.object({
-   id : z.number(),
-   email : z.string().email(),
-   username : z.string(),
-   password : z.string().min(8)
-})
-const SignInUserSchema = SignUpUserSchema.pick({'email':true,'password':true})
+
+
 
 
 // type definitions
 
  
-
-type SignUpUserSchemaType = z.infer<typeof SignUpUserSchema>;
-type SignInUserSchema = z.infer<typeof SignInUserSchema>;
-type NewUserType = Pick<SignUpUserSchemaType,"id">;
+type UserSchema = z.infer<typeof SignUpUserSchema>;
+type SignUpUserSchemaType = Pick<UserSchema,"email"|"password"|"username">;
+type SignInUserSchemaType = z.infer<typeof SignInUserSchema>;
 
 
 
@@ -55,10 +48,10 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
          message : "either email doesn't exist or password isn't of 8 characters"
       })
    }
-   const {username,email,password} = req.body;
+   const {username,email,password}:SignUpUserSchemaType = req.body;
 
    try{
-      const UserExist:SignUpUserSchemaType | null = await prisma.user.findFirst({
+      const UserExist = await prisma.user.findFirst({
          where : {
             email:email
          }
@@ -69,7 +62,7 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
             message: "User with these credentials already exits"
          })
       }
-      const newUser:NewUserType = await prisma.user.create({
+      const newUser = await prisma.user.create({
          data:{
             username,
             email,
@@ -105,7 +98,7 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
       })
    }
    try{
-      const UserExist:NewUserType | null = await prisma.user.findFirst({
+      const UserExist = await prisma.user.findFirst({
          where:{
             id:Number(Id)
          },
@@ -131,9 +124,9 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
    
 })
 UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
-   const {email,password}:SignInUserSchema = req.body;
+   const {email,password}:SignInUserSchemaType = req.body;
    try{
-      const UserExist:NewUserType | null = await prisma.user.findFirst({
+      const UserExist = await prisma.user.findFirst({
          where:{
             email:email,
             password:password

@@ -15,18 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const middleware_1 = require("../middleware");
 const client_1 = require("@prisma/client");
-const zod_1 = __importDefault(require("zod"));
 const StatusCodes_1 = __importDefault(require("../StatusCodes"));
 const PostsRouter = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 PostsRouter.use(express_1.default.json());
-const PostsSchemaZod = zod_1.default.object({
-    id: zod_1.default.number(),
-    userId: zod_1.default.number(),
-    title: zod_1.default.string(),
-    body: zod_1.default.string(),
-    tags: zod_1.default.string().array()
-});
 PostsRouter.get('/yourposts', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const Id = req.id;
     try {

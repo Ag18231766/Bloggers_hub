@@ -13,27 +13,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const zod_1 = __importDefault(require("zod"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const StatusCodes_1 = __importDefault(require("../StatusCodes"));
 const client_1 = require("@prisma/client");
 const config_1 = __importDefault(require("../config"));
 const middleware_1 = require("../middleware");
+const medium_type_1 = require("@amartya_gupta/medium_type");
 const UserRouter = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 // middlewares
 UserRouter.use(express_1.default.json());
-// zod definitions
-const SignUpUserSchema = zod_1.default.object({
-    id: zod_1.default.number(),
-    email: zod_1.default.string().email(),
-    username: zod_1.default.string(),
-    password: zod_1.default.string().min(8)
-});
-const SignInUserSchema = SignUpUserSchema.pick({ 'email': true, 'password': true });
 // routehandlers
 UserRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { success } = SignUpUserSchema.partial({ id: true }).safeParse(req.body);
+    const { success } = medium_type_1.SignUpUserSchema.partial({ id: true }).safeParse(req.body);
     if (!success) {
         return res.status(StatusCodes_1.default.BADREQUEST).json({
             message: "either email doesn't exist or password isn't of 8 characters"

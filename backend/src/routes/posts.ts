@@ -4,24 +4,16 @@ import { Posts, PrismaClient } from '@prisma/client';
 import z, { number } from 'zod';
 import StatusCodes from '../StatusCodes';
 import { create } from 'domain';
+import {PostsSchemaZod} from "@amartya_gupta/medium_type";
 
 const PostsRouter = express.Router();
 const prisma = new PrismaClient();
 
 PostsRouter.use(express.json());
 
-const PostsSchemaZod = z.object({
-   id : z.number(),
-   userId: z.number(),
-   title: z.string(),
-   body: z.string(),
-   tags : z.string().array()
-});
 
 
 type PostsSchema = z.infer<typeof PostsSchemaZod>;
-type UserPostsSchema = Pick<PostsSchema,'id'|'userId'|'title'|'body'>;
-type AllpostsType = Pick<PostsSchema,'title'>;
 type SinglePostSchema = Pick<PostsSchema,'title' | 'body' | 'tags'>;
 type BodyType = Pick<PostsSchema,'title' | 'body' | 'userId'>
 
@@ -32,7 +24,7 @@ PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Respons
    const Id = req.id as string;
 
    try{
-      const UserPosts:{posts:UserPostsSchema[]} | null = await prisma.user.findFirst({
+      const UserPosts = await prisma.user.findFirst({
          where:{
             id:Number(Id)
          },
@@ -57,7 +49,7 @@ PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Respons
 PostsRouter.get('/allposts',authMiddleware,async (req:Request,res:Response) => {
    
    try{
-      const AllPosts:AllpostsType[] = await prisma.posts.findMany();
+      const AllPosts = await prisma.posts.findMany();
       return res.json({
          posts : AllPosts
       })
@@ -199,7 +191,7 @@ PostsRouter.delete('/:postid',authMiddleware,async (req:CustomRequest,res:Respon
    const Id = req.id as string;
    const id = req.params.postid as string;
    try{
-      const IsOwner:UserPostsSchema | null = await prisma.posts.findFirst({
+      const IsOwner = await prisma.posts.findFirst({
          where:{
             userId:{
                equals:Number(Id)
