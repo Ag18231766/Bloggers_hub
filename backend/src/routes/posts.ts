@@ -46,10 +46,26 @@ PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Respons
    
 })
 
-PostsRouter.get('/allposts',authMiddleware,async (req:Request,res:Response) => {
+PostsRouter.get('/allposts/:title/:page',authMiddleware,async (req:Request,res:Response) => {
+   const page = Number((req.params.page as string));
+   const title = req.params.title;
+   let SkipPosts;
+   if(page != 0){
+      SkipPosts = 10 * (page - 1);
+   }else{
+      SkipPosts = 0;
+   }
    
    try{
-      const AllPosts = await prisma.posts.findMany();
+      const AllPosts = await prisma.posts.findMany({
+         take:10,
+         skip:SkipPosts,
+         where:{
+            title:{
+               contains: title
+            }
+         }
+      });
       return res.json({
          posts : AllPosts
       })

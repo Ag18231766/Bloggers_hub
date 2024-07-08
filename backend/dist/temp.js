@@ -13,12 +13,19 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 function temp() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield prisma.admin.create({
-            data: {
-                name: "raj",
-                password: "randomPassword"
-            }
+        const tags = yield prisma.tags.findMany({
+            take: 4,
         });
+        const lastPostInResults = tags[3];
+        const myCursor = lastPostInResults.id;
+        const secondQuery = yield prisma.tags.findMany({
+            take: 4,
+            skip: 1,
+            cursor: {
+                id: myCursor,
+            },
+        });
+        console.log(secondQuery[3].tag);
     });
 }
 temp();

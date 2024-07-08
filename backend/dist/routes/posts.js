@@ -41,9 +41,26 @@ PostsRouter.get('/yourposts', middleware_1.authMiddleware, (req, res) => __await
         });
     }
 }));
-PostsRouter.get('/allposts', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+PostsRouter.get('/allposts/:title/:page', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const page = Number(req.params.page);
+    const title = req.params.title;
+    let SkipPosts;
+    if (page != 0) {
+        SkipPosts = 10 * (page - 1);
+    }
+    else {
+        SkipPosts = 0;
+    }
     try {
-        const AllPosts = yield prisma.posts.findMany();
+        const AllPosts = yield prisma.posts.findMany({
+            take: 10,
+            skip: SkipPosts,
+            where: {
+                title: {
+                    contains: title
+                }
+            }
+        });
         return res.json({
             posts: AllPosts
         });
