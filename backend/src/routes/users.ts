@@ -45,7 +45,7 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
    const {success} = SignUpUserSchema.partial({id:true}).safeParse(req.body);
    
    if(!success){
-      return res.status(StatusCodes.BADREQUEST).json({
+      return res.status(StatusCodes.OK).json({
          message : "either email doesn't exist or password isn't of 8 characters"
       })
    }
@@ -59,7 +59,7 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
       })
       
       if(UserExist){
-         return res.status(StatusCodes.CONFLICT).json({
+         return res.status(StatusCodes.OK).json({
             message: "User with these credentials already exits"
          })
       }
@@ -108,7 +108,7 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
          }
       })
       if(!UserExist){
-         return res.status(StatusCodes.NOT_FOUND).json({
+         return res.status(StatusCodes.OK).json({
             message : "user doesn't exist"
          })
       }
@@ -137,7 +137,7 @@ UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
          }
       })
       if(!UserExist){
-         return res.json({
+         return res.status(StatusCodes.OK).json({
             message : "user doesn't exist"
          })
       }

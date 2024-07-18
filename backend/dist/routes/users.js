@@ -29,7 +29,7 @@ UserRouter.use((0, cors_1.default)());
 UserRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { success } = medium_type_1.SignUpUserSchema.partial({ id: true }).safeParse(req.body);
     if (!success) {
-        return res.status(StatusCodes_1.default.BADREQUEST).json({
+        return res.status(StatusCodes_1.default.OK).json({
             message: "either email doesn't exist or password isn't of 8 characters"
         });
     }
@@ -41,7 +41,7 @@ UserRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, funct
             }
         });
         if (UserExist) {
-            return res.status(StatusCodes_1.default.CONFLICT).json({
+            return res.status(StatusCodes_1.default.OK).json({
                 message: "User with these credentials already exits"
             });
         }
@@ -85,7 +85,7 @@ UserRouter.post('/signin', middleware_1.authMiddleware, (req, res) => __awaiter(
             }
         });
         if (!UserExist) {
-            return res.status(StatusCodes_1.default.NOT_FOUND).json({
+            return res.status(StatusCodes_1.default.OK).json({
                 message: "user doesn't exist"
             });
         }
@@ -114,7 +114,7 @@ UserRouter.post('/signinPassword', (req, res) => __awaiter(void 0, void 0, void 
             }
         });
         if (!UserExist) {
-            return res.json({
+            return res.status(StatusCodes_1.default.OK).json({
                 message: "user doesn't exist"
             });
         }
