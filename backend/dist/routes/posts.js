@@ -16,9 +16,11 @@ const express_1 = __importDefault(require("express"));
 const middleware_1 = require("../middleware");
 const client_1 = require("@prisma/client");
 const StatusCodes_1 = __importDefault(require("../StatusCodes"));
+const cors_1 = __importDefault(require("cors"));
 const PostsRouter = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 PostsRouter.use(express_1.default.json());
+PostsRouter.use((0, cors_1.default)());
 PostsRouter.get('/yourposts', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const Id = req.id;
     try {

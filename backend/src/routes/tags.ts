@@ -7,8 +7,13 @@ import StatusCodes from '../StatusCodes';
 import JWT_PASSWORD from '../config';
 import { STATUS_CODES } from 'http';
 import {AdminZod} from "@amartya_gupta/medium_type";
+import cors from 'cors';
+
+
+
 const TagRouter = express.Router();
 TagRouter.use(express.json());
+TagRouter.use(cors());
 
 const prisma = new PrismaClient();
 

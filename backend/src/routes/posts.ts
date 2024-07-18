@@ -5,11 +5,13 @@ import z, { number } from 'zod';
 import StatusCodes from '../StatusCodes';
 import { create } from 'domain';
 import {PostsSchemaZod} from "@amartya_gupta/medium_type";
+import cors from 'cors';
 
 const PostsRouter = express.Router();
 const prisma = new PrismaClient();
 
 PostsRouter.use(express.json());
+PostsRouter.use(cors());
 
 
 

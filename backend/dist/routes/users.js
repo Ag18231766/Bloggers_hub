@@ -19,10 +19,12 @@ const client_1 = require("@prisma/client");
 const config_1 = __importDefault(require("../config"));
 const middleware_1 = require("../middleware");
 const medium_type_1 = require("@amartya_gupta/medium_type");
+const cors_1 = __importDefault(require("cors"));
 const UserRouter = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 // middlewares
 UserRouter.use(express_1.default.json());
+UserRouter.use((0, cors_1.default)());
 // routehandlers
 UserRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { success } = medium_type_1.SignUpUserSchema.partial({ id: true }).safeParse(req.body);

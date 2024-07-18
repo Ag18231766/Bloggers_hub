@@ -7,6 +7,7 @@ import JWT_PASSWORD from '../config';
 import { CustomRequest, UserPayload, authMiddleware } from '../middleware';
 import { STATUS_CODES } from 'http';
 import {SignUpUserSchema,SignInUserSchema} from '@amartya_gupta/medium_type';
+import cors from 'cors';
 
 
 const UserRouter = express.Router();
@@ -15,7 +16,7 @@ const prisma = new PrismaClient();
 
 // middlewares
 UserRouter.use(express.json());
-
+UserRouter.use(cors());
 
 
 

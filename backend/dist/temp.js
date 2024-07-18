@@ -11,21 +11,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
+// async function temp(user:string,email:string,password:string):Promise<void>{
+//     const tags = await prisma.user.create({
+//         data:{
+//             username:user,
+//             email:email,
+//             password:password
+//         }
+//     })
+// }
+// function insertion(){
+//     for(let j = 0;j < 10000;j++){
+//         temp(String(j),String(j) + "@gmail.com","randomPassword");
+//     }
+// }
+// insertion();
+// 21056 - 31055
 function temp() {
     return __awaiter(this, void 0, void 0, function* () {
-        const tags = yield prisma.tags.findMany({
-            take: 4,
-        });
-        const lastPostInResults = tags[3];
-        const myCursor = lastPostInResults.id;
-        const secondQuery = yield prisma.tags.findMany({
-            take: 4,
-            skip: 1,
-            cursor: {
-                id: myCursor,
-            },
-        });
-        console.log(secondQuery[3].tag);
+        for (let i = 40002; i < 42135; i++) {
+            yield prisma.posts.create({
+                data: {
+                    title: String(i),
+                    body: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula jwlsekflksdmflksdl nfsjdlfkcmwlsd jdlsfkmcwsld",
+                    userId: i
+                }
+            });
+        }
     });
 }
 temp();

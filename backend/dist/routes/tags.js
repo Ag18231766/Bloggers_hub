@@ -19,8 +19,10 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const StatusCodes_1 = __importDefault(require("../StatusCodes"));
 const config_1 = __importDefault(require("../config"));
 const medium_type_1 = require("@amartya_gupta/medium_type");
+const cors_1 = __importDefault(require("cors"));
 const TagRouter = express_1.default.Router();
 TagRouter.use(express_1.default.json());
+TagRouter.use((0, cors_1.default)());
 const prisma = new client_1.PrismaClient();
 TagRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { success } = medium_type_1.AdminZod.safeParse(req.body);
