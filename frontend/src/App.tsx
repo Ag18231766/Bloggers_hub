@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Route, Routes} from 'react-router-dom'
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
 import { Landing } from './pages/Landing'
@@ -12,7 +12,6 @@ function App() {
 
   return (
     <BrowserRouter>
-      <AppBar></AppBar>
       <Routes>
         <Route path="/SignIn" element={<SignIn></SignIn>}></Route>
         <Route path="/SignUp" element={<SignUp></SignUp>}></Route>
@@ -21,21 +20,13 @@ function App() {
         <Route path="/PostCreation" element={<PostCreation></PostCreation>}></Route>
         <Route path="/PostsView" element={<Postsview></Postsview>}></Route>
       </Routes>
-      hello
     </BrowserRouter>
   )
 }
 
-function AppBar(){
-  const navigation = useNavigate();
 
-  function call(){
-    navigation('/Dashboard');
-  }
 
-  return (
-    <button onClick={call}>Dashboard</button>
-  )
-}
+
+
 
 export default App
