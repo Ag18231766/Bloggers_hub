@@ -79,7 +79,7 @@ TagRouter.post("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0,
             },
             data: {
                 tag: {
-                    // Connect the existing tags
+                    // Connect the existing tags 
                     connect: [],
                     // Connect the new tags
                     connectOrCreate: tagArr.arr.map(tag => ({
@@ -96,6 +96,24 @@ TagRouter.post("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0,
     catch (error) {
         console.log(error);
         res.status(StatusCodes_1.default.BAD_GATEWAY).json({
+            message: "can't connect to database"
+        });
+    }
+}));
+TagRouter.get("/tag", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const tags = yield prisma.tags.findMany({
+            select: {
+                tag: true
+            }
+        });
+        return res.status(StatusCodes_1.default.OK).json({
+            arr: tags
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(StatusCodes_1.default.BAD_GATEWAY).json({
             message: "can't connect to database"
         });
     }
