@@ -100,7 +100,7 @@ TagRouter.post("/",authMiddleware,async (req:CustomRequest,res:Response) => {
     }
 })
 
-TagRouter.get("/tag",authMiddleware,async (req:Request,res:Response) => {
+TagRouter.get('/tag',authMiddleware,async (req:Request,res:Response) => {
     try{
         const tags:{tag:string}[] = await prisma.tags.findMany({
             select:{
