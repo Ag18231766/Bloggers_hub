@@ -12,6 +12,7 @@ interface UserPayload extends JwtPayload{
 
 interface CustomRequest extends Request {
     id?: string;
+    token?: string;
 }
 
 const authMiddleware = (req:CustomRequest,res:Response,next:NextFunction) => {
@@ -35,7 +36,7 @@ const authMiddleware = (req:CustomRequest,res:Response,next:NextFunction) => {
         
         if(decoded){
             req.id = decoded.id;
-            
+            req.token = token;
             next();
         }else{
             res.json({

@@ -42,7 +42,11 @@ type SignInUserSchemaType = z.infer<typeof SignInUserSchema>;
 
 UserRouter.post('/signup',async (req:Request,res:Response)=> {
    
+
+
+   
    const {success} = SignUpUserSchema.partial({id:true}).safeParse(req.body);
+   
    
    if(!success){
       return res.status(StatusCodes.OK).json({
@@ -50,7 +54,7 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
       })
    }
    const {username,email,password}:SignUpUserSchemaType = req.body;
-
+   
    try{
       const UserExist = await prisma.user.findFirst({
          where : {
@@ -92,7 +96,7 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
 
 UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) => {
    const Id = req.id as string;
-
+   const token = req.token as string;
    if(!Id){
       return res.json({
          message : 'id not defined'
@@ -112,7 +116,6 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
             message : "user doesn't exist"
          })
       }
-      const token = jwt.sign({id:Id},JWT_PASSWORD);
       return res.json({
          token : token
       })

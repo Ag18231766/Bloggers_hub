@@ -76,7 +76,7 @@ TagRouter.post("/",authMiddleware,async (req:CustomRequest,res:Response) => {
             },
             data: {
               tag: {
-                // Connect the existing tags
+                // Connect the existing tags 
                 connect: [],
                 // Connect the new tags
                 connectOrCreate: tagArr.arr.map(tag => ({
@@ -98,6 +98,25 @@ TagRouter.post("/",authMiddleware,async (req:CustomRequest,res:Response) => {
             message : "can't connect to database"
         })
     }
+})
+
+TagRouter.get('/tag',authMiddleware,async (req:Request,res:Response) => {
+    try{
+        const tags = prisma.tags.findMany({
+            select:{
+                tag:true
+            }
+        });
+        return res.status(StatusCodes.OK).json({
+            arr:tags
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_GATEWAY).json({
+            message: "can't connect to database"
+        })
+    }
+
 })
 
 

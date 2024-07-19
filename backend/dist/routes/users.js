@@ -70,6 +70,7 @@ UserRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, funct
 }));
 UserRouter.post('/signin', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const Id = req.id;
+    const token = req.token;
     if (!Id) {
         return res.json({
             message: 'id not defined'
@@ -89,7 +90,6 @@ UserRouter.post('/signin', middleware_1.authMiddleware, (req, res) => __awaiter(
                 message: "user doesn't exist"
             });
         }
-        const token = jsonwebtoken_1.default.sign({ id: Id }, config_1.default);
         return res.json({
             token: token
         });

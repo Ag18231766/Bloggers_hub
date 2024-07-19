@@ -20,6 +20,7 @@ const authMiddleware = (req, res, next) => {
         const decoded = jsonwebtoken_1.default.verify(token, config_1.default);
         if (decoded) {
             req.id = decoded.id;
+            req.token = token;
             next();
         }
         else {
