@@ -66,6 +66,13 @@ PostsRouter.get('/allposts/:title/:page',authMiddleware,async (req:Request,res:R
             title:{
                contains: title
             }
+         },
+         include:{
+            user:{
+               select:{
+                  username:true
+               }
+            }
          }
       });
       return res.json({
