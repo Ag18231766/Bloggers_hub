@@ -130,6 +130,7 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
 })
 UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
    const {email,password}:SignInUserSchemaType = req.body;
+   console.log(email + " " + password);
    try{
       const UserExist = await prisma.user.findFirst({
          where:{

@@ -29,7 +29,14 @@ PostsRouter.get('/yourposts', middleware_1.authMiddleware, (req, res) => __await
                 id: Number(Id)
             },
             select: {
-                posts: true
+                username: true,
+                posts: {
+                    select: {
+                        title: true,
+                        body: true,
+                        createdAt: true
+                    }
+                }
             }
         });
         return res.json({

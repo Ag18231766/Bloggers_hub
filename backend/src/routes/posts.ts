@@ -31,7 +31,14 @@ PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Respons
             id:Number(Id)
          },
          select:{
-            posts:true
+            username:true,
+            posts:{
+               select:{
+                  title:true,
+                  body:true,
+                  createdAt:true
+               }
+            }
          }
       })
    
