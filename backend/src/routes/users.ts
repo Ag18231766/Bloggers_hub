@@ -108,7 +108,7 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
             id:Number(Id)
          },
          select:{
-            id:true
+            username:true
          }
       })
       if(!UserExist){
@@ -117,7 +117,8 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
          })
       }
       return res.json({
-         token : token
+         token : token,
+         username:UserExist.username
       })
    }catch(error){
       console.log(error);

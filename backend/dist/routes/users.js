@@ -82,7 +82,7 @@ UserRouter.post('/signin', middleware_1.authMiddleware, (req, res) => __awaiter(
                 id: Number(Id)
             },
             select: {
-                id: true
+                username: true
             }
         });
         if (!UserExist) {
@@ -91,7 +91,8 @@ UserRouter.post('/signin', middleware_1.authMiddleware, (req, res) => __awaiter(
             });
         }
         return res.json({
-            token: token
+            token: token,
+            username: UserExist.username
         });
     }
     catch (error) {
