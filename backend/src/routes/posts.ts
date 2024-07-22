@@ -24,14 +24,20 @@ type BodyType = Pick<PostsSchema,'title' | 'body' | 'userId'>
 
 PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Response) => {
    const Id = req.id as string;
-
    try{
       const UserPosts = await prisma.user.findFirst({
          where:{
             id:Number(Id)
          },
          select:{
-            posts:true
+            username:true,
+            posts:{
+               select:{
+                  title:true,
+                  body:true,
+                  createdAt:true
+               }
+            }
          }
       })
    
