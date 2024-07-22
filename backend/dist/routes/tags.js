@@ -100,7 +100,7 @@ TagRouter.post("/", middleware_1.authMiddleware, (req, res) => __awaiter(void 0,
         });
     }
 }));
-TagRouter.get('/tag', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+TagRouter.get("/tag", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const tags = yield prisma.tags.findMany({
             select: {

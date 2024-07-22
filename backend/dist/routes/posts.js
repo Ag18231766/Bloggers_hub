@@ -61,13 +61,6 @@ PostsRouter.get('/allposts/:title/:page', middleware_1.authMiddleware, (req, res
                 title: {
                     contains: title
                 }
-            },
-            include: {
-                user: {
-                    select: {
-                        username: true
-                    }
-                }
             }
         });
         return res.json({
