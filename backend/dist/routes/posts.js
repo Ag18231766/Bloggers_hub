@@ -23,24 +23,15 @@ PostsRouter.use(express_1.default.json());
 PostsRouter.use((0, cors_1.default)());
 PostsRouter.get('/yourposts', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const Id = req.id;
-    console.log('hi');
     try {
         const UserPosts = yield prisma.user.findFirst({
             where: {
                 id: Number(Id)
             },
             select: {
-                username: true,
-                posts: {
-                    select: {
-                        title: true,
-                        body: true,
-                        createdAt: true
-                    }
-                }
+                posts: true
             }
         });
-        console.log('hi');
         return res.json({
             userposts: UserPosts
         });

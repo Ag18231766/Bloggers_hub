@@ -108,7 +108,7 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
             id:Number(Id)
          },
          select:{
-            username:true
+            id:true
          }
       })
       if(!UserExist){
@@ -117,8 +117,7 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
          })
       }
       return res.json({
-         token : token,
-         username:UserExist.username
+         token : token
       })
    }catch(error){
       console.log(error);
@@ -130,7 +129,6 @@ UserRouter.post('/signin',authMiddleware,async (req:CustomRequest,res:Response) 
 })
 UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
    const {email,password}:SignInUserSchemaType = req.body;
-   
    try{
       const UserExist = await prisma.user.findFirst({
          where:{
@@ -141,13 +139,11 @@ UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
             id:true
          }
       })
-      
       if(!UserExist){
          return res.status(StatusCodes.OK).json({
             message : "user doesn't exist"
          })
       }
-      
       const token = jwt.sign({id:UserExist.id},JWT_PASSWORD);
       return res.json({
          token : token

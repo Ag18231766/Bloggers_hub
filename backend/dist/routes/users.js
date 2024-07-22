@@ -82,7 +82,7 @@ UserRouter.post('/signin', middleware_1.authMiddleware, (req, res) => __awaiter(
                 id: Number(Id)
             },
             select: {
-                username: true
+                id: true
             }
         });
         if (!UserExist) {
@@ -91,8 +91,7 @@ UserRouter.post('/signin', middleware_1.authMiddleware, (req, res) => __awaiter(
             });
         }
         return res.json({
-            token: token,
-            username: UserExist.username
+            token: token
         });
     }
     catch (error) {
@@ -104,7 +103,6 @@ UserRouter.post('/signin', middleware_1.authMiddleware, (req, res) => __awaiter(
 }));
 UserRouter.post('/signinPassword', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
-    console.log('hi');
     try {
         const UserExist = yield prisma.user.findFirst({
             where: {
@@ -115,13 +113,11 @@ UserRouter.post('/signinPassword', (req, res) => __awaiter(void 0, void 0, void 
                 id: true
             }
         });
-        console.log('hi');
         if (!UserExist) {
             return res.status(StatusCodes_1.default.OK).json({
                 message: "user doesn't exist"
             });
         }
-        console.log('hi');
         const token = jsonwebtoken_1.default.sign({ id: UserExist.id }, config_1.default);
         return res.json({
             token: token
