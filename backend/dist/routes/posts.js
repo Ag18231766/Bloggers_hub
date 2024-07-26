@@ -154,24 +154,17 @@ PostsRouter.get('/:filter', middleware_1.authMiddleware, (req, res) => __awaiter
     const filter = req.params.filter;
     const Id = req.id;
     try {
-        const post = yield prisma.user.findFirst({
+        const post = yield prisma.posts.findMany({
             where: {
-                id: Number(Id)
+                title: {
+                    contains: filter
+                }
             },
             select: {
-                posts: {
-                    where: {
-                        title: {
-                            contains: filter
-                        }
-                    },
-                    select: {
-                        id: true,
-                        title: true,
-                        body: true,
-                        tags: true
-                    }
-                }
+                id: true,
+                title: true,
+                body: true,
+                tags: true
             }
         });
         if (!post) {
@@ -180,7 +173,7 @@ PostsRouter.get('/:filter', middleware_1.authMiddleware, (req, res) => __awaiter
             });
         }
         return res.json({
-            post: post.posts
+            post: post
         });
     }
     catch (error) {

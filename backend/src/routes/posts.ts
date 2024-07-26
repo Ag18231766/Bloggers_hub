@@ -164,25 +164,18 @@ PostsRouter.get('/:filter',authMiddleware,async (req:CustomRequest,res:Response)
    const filter = req.params.filter as string;
    const Id = req.id as string;
    try{
-      const post = await prisma.user.findFirst({
+      const post = await prisma.posts.findMany({
          where:{
-            id:Number(Id)
+            title:{
+               contains: filter
+            }
          },
          select: {
-            posts: {
-              where: {
-               title:{
-                  contains: filter
-               }
-              },
-              select: {
-                id: true,
-                title: true,
-                body: true,
-                tags: true
-              }
-            }
-         }
+            id: true,
+            title: true,
+            body: true,
+            tags: true
+          }
       });
       if(!post){
          return res.json({
@@ -190,7 +183,7 @@ PostsRouter.get('/:filter',authMiddleware,async (req:CustomRequest,res:Response)
          })
       }
       return res.json({
-         post : post.posts
+         post : post
       })
    }catch(error){
       console.log(error);
