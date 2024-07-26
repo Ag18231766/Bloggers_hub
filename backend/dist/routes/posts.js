@@ -21,24 +21,46 @@ const PostsRouter = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 PostsRouter.use(express_1.default.json());
 PostsRouter.use((0, cors_1.default)());
-PostsRouter.get('/yourposts', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+PostsRouter.get('/yourposts/:page', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const Id = req.id;
+    const page = Number(req.params.page);
+    let skipPosts;
+    if (page > 0) {
+        skipPosts = 10 * (page - 1);
+    }
+    else if (page == 0) {
+        skipPosts = 0;
+    }
+    else {
+        return res.status(StatusCodes_1.default.BADREQUEST).json({
+            message: "page entered is negative"
+        });
+    }
+    console.log(skipPosts);
     try {
-        const UserPosts = yield prisma.user.findFirst({
-            where: {
-                id: Number(Id)
-            },
+        const UserPosts = yield prisma.user.findUnique({
             select: {
                 username: true,
                 posts: {
                     select: {
+                        id: true,
                         title: true,
                         body: true,
                         createdAt: true
-                    }
+                    },
+                    take: 10,
+                    skip: skipPosts
                 }
+            },
+            where: {
+                id: Number(Id)
             }
         });
+        if (UserPosts == null) {
+            return res.status(StatusCodes_1.default.NOT_FOUND).json({
+                message: "something went wrong"
+            });
+        }
         return res.json({
             userposts: UserPosts
         });

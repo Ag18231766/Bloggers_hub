@@ -22,25 +22,46 @@ type BodyType = Pick<PostsSchema,'title' | 'body' | 'userId'>
 
 
 
-PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Response) => {
+PostsRouter.get('/yourposts/:page',authMiddleware,async (req:CustomRequest,res:Response) => {
    const Id = req.id as string;
+   const page = Number(req.params.page as string);
+   let skipPosts;
+   if(page > 0){
+      skipPosts = 10 * (page - 1);
+   }else if(page == 0){
+      skipPosts = 0;
+   }else{
+      return res.status(StatusCodes.BADREQUEST).json({
+         message:"page entered is negative"
+      })
+   }
+   console.log(skipPosts);
 
    try{
-      const UserPosts = await prisma.user.findFirst({
-         where:{
-            id:Number(Id)
-         },
+      const UserPosts = await prisma.user.findUnique({
          select:{
             username:true,
             posts:{
                select:{
+                  id:true,
                   title:true,
                   body:true,
                   createdAt:true
-               }
+               },
+               take:10,
+               skip:skipPosts
             }
+         },
+         where:{
+            id:Number(Id)
          }
       })
+
+      if(UserPosts == null){
+         return res.status(StatusCodes.NOT_FOUND).json({
+            message : "something went wrong"
+         })
+      }
    
       return res.json({
          userposts : UserPosts
@@ -54,6 +75,8 @@ PostsRouter.get('/yourposts',authMiddleware,async (req:CustomRequest,res:Respons
 
    
 })
+
+
 
 PostsRouter.get('/allposts/:title/:page',authMiddleware,async (req:Request,res:Response) => {
    const page = Number((req.params.page as string));
