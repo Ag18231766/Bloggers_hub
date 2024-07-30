@@ -102,9 +102,10 @@ TagRouter.post("/",authMiddleware,async (req:CustomRequest,res:Response) => {
 
 TagRouter.get("/tag",authMiddleware,async (req:Request,res:Response) => {
     try{
-        const tags:{tag:string}[] = await prisma.tags.findMany({
+        const tags:{tag:string,id:number}[] = await prisma.tags.findMany({
             select:{
-                tag:true
+                tag:true,
+                id:true
             }
         });
         return res.status(StatusCodes.OK).json({

@@ -19,6 +19,7 @@ const prisma = new client_1.PrismaClient();
 //             password:password
 //         }
 //     })
+//
 // }
 // function insertion(){
 //     for(let j = 0;j < 10000;j++){
@@ -29,15 +30,16 @@ const prisma = new client_1.PrismaClient();
 // 21056 - 31055
 function temp() {
     return __awaiter(this, void 0, void 0, function* () {
-        for (let i = 40002; i < 42135; i++) {
-            yield prisma.posts.create({
-                data: {
-                    title: String(i),
-                    body: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula jwlsekflksdmflksdl nfsjdlfkcmwlsd jdlsfkmcwsld",
-                    userId: i
-                }
-            });
-        }
+        const posts = yield prisma.postTag.findMany({
+            where: {
+                tagId: 1
+            },
+            select: {
+                post: true
+            }
+        });
+        console.log(posts);
     });
 }
 temp();
+// console.log('hi');

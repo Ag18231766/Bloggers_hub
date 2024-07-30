@@ -163,8 +163,6 @@ PostsRouter.get('/:filter', middleware_1.authMiddleware, (req, res) => __awaiter
             select: {
                 id: true,
                 title: true,
-                body: true,
-                tags: true
             }
         });
         if (!post) {
@@ -173,7 +171,7 @@ PostsRouter.get('/:filter', middleware_1.authMiddleware, (req, res) => __awaiter
             });
         }
         return res.json({
-            post: post
+            post
         });
     }
     catch (error) {

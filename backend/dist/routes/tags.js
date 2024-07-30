@@ -104,7 +104,8 @@ TagRouter.get("/tag", middleware_1.authMiddleware, (req, res) => __awaiter(void 
     try {
         const tags = yield prisma.tags.findMany({
             select: {
-                tag: true
+                tag: true,
+                id: true
             }
         });
         return res.status(StatusCodes_1.default.OK).json({

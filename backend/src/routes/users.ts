@@ -1,5 +1,5 @@
 import express,{Response,Request} from 'express';
-import z from 'zod';
+import z, { string } from 'zod';
 import jwt from 'jsonwebtoken';
 import StatusCodes from '../StatusCodes';
 import { PrismaClient } from '@prisma/client';
@@ -30,6 +30,9 @@ type UserSchema = z.infer<typeof SignUpUserSchema>;
 type SignUpUserSchemaType = Pick<UserSchema,"email"|"password"|"username">;
 type SignInUserSchemaType = z.infer<typeof SignInUserSchema>;
 
+const TagsInput = z.object({
+   tagArr : z.array(z.string())
+})
 
 
 
@@ -158,6 +161,44 @@ UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
    }
    
 
+})
+
+UserRouter.post('/postTags',authMiddleware,async (req:CustomRequest,res:Response) => {
+   const Id = Number((req.id as string));
+   const {success} = TagsInput.safeParse(req.body);
+   if(!success){
+      return res.json({
+         message : "either no tag selected or wrong input sent"
+      })
+   }
+   const {tagArr} = req.body;
+   console.log(tagArr);
+   try{
+      const User = await prisma.user.update({
+         select:{
+            id:true
+         },
+         data:{
+            tags:tagArr
+         },
+         where:{
+            id:Id
+         }
+      })
+      if(!User){
+         res.json({
+            message:"user doesn't exist"
+         })
+      }
+      return res.json({
+         message:'tags added successfully'
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+         mesage : "database is not up"
+      })
+   }
 })
 
 

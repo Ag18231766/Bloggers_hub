@@ -173,8 +173,6 @@ PostsRouter.get('/:filter',authMiddleware,async (req:CustomRequest,res:Response)
          select: {
             id: true,
             title: true,
-            body: true,
-            tags: true
           }
       });
       if(!post){
@@ -183,7 +181,7 @@ PostsRouter.get('/:filter',authMiddleware,async (req:CustomRequest,res:Response)
          })
       }
       return res.json({
-         post : post
+         post
       })
    }catch(error){
       console.log(error);
