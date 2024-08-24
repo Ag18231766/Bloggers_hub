@@ -11,35 +11,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
-// async function temp(user:string,email:string,password:string):Promise<void>{
-//     const tags = await prisma.user.create({
-//         data:{
-//             username:user,
-//             email:email,
-//             password:password
-//         }
-//     })
-//
-// }
-// function insertion(){
-//     for(let j = 0;j < 10000;j++){
-//         temp(String(j),String(j) + "@gmail.com","randomPassword");
-//     }
-// }
-// insertion();
-// 21056 - 31055
-function temp() {
+function temp(user, email, password) {
     return __awaiter(this, void 0, void 0, function* () {
-        const posts = yield prisma.postTag.findMany({
-            where: {
-                tagId: 1
-            },
-            select: {
-                post: true
+        const tags = yield prisma.user.create({
+            data: {
+                username: user,
+                email: email,
+                password: password
             }
         });
-        console.log(posts);
     });
 }
-temp();
+function insertion() {
+    for (let j = 0; j < 10000; j++) {
+        temp(String(j), String(j) + "@gmail.com", "randomPassword");
+    }
+}
+insertion();
+// 21056 - 31055
+// async function temp():Promise<void>{
+//     const email = 'emelie@prisma.io'
+//     const result = await prisma.$queryRaw`SELECT * FROM User WHERE email = ${email}`
+//     // await prisma.user.findMany({
+//     //     where:{
+//     //         id:50004,
+//     //     },
+//     //     select:{
+//     //         posts:{
+//     //             select:{
+//     //                 title:true
+//     //             },
+//     //             orderBy:
+//     //         }
+//     //     }
+//     // })
+// }
+// temp();
 // console.log('hi');

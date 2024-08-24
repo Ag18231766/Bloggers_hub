@@ -163,7 +163,7 @@ UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
 
 })
 
-UserRouter.post('/postTags',authMiddleware,async (req:CustomRequest,res:Response) => {
+UserRouter.put('/postTags',authMiddleware,async (req:CustomRequest,res:Response) => {
    const Id = Number((req.id as string));
    const {success} = TagsInput.safeParse(req.body);
    if(!success){
@@ -172,6 +172,7 @@ UserRouter.post('/postTags',authMiddleware,async (req:CustomRequest,res:Response
       })
    }
    const {tagArr} = req.body;
+   
    console.log(tagArr);
    try{
       const User = await prisma.user.update({
@@ -179,7 +180,9 @@ UserRouter.post('/postTags',authMiddleware,async (req:CustomRequest,res:Response
             id:true
          },
          data:{
-            tags:tagArr
+            tags:{
+               push:tagArr
+            }
          },
          where:{
             id:Id

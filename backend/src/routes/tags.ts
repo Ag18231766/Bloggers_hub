@@ -120,6 +120,56 @@ TagRouter.get("/tag",authMiddleware,async (req:Request,res:Response) => {
 
 })
 
+TagRouter.get("/:tagId/:page",authMiddleware,async (req:CustomRequest,res:Response) => {
+    const tagId = Number(req.params.tagId);
+    const page = Number(req.params.page as string);
+    let skipPosts;
+    if(page > 0){
+        skipPosts = 10 * (page - 1);
+    }else if(page == 0){
+        skipPosts = 0;
+    }else{
+        return res.status(StatusCodes.BADREQUEST).json({
+            message:"page entered is negative"
+        })
+    }
+    try{
+        const posts = await prisma.postTag.findMany({
+            where:{
+                tagId:tagId
+            },
+            select:{
+                post:{
+                    select:{
+                        id:true,
+                        title:true,
+                        body:true,
+                        createdAt:true,
+                        user:{
+                            select:{
+                                username:true
+                            }
+                        }
+                    }
+                }
+            },
+            take:10,
+            skip:skipPosts
+
+        })
+        const userPosts = posts.map((t) => t.post);
+        res.json({
+            userPosts
+        })
+
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_GATEWAY).json({
+            message: "can't connect to database"
+        })
+    }
+})
+
 
 
 

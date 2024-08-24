@@ -35,36 +35,36 @@ PostsRouter.get('/yourposts/:page',authMiddleware,async (req:CustomRequest,res:R
          message:"page entered is negative"
       })
    }
-   console.log(skipPosts);
+   console.log(skipPosts + " hi");
 
    try{
-      const UserPosts = await prisma.user.findUnique({
+      const posts = await prisma.posts.findMany({
          select:{
-            username:true,
-            posts:{
+            id:true,
+            title:true,
+            body:true,
+            createdAt:true,
+            user:{
                select:{
-                  id:true,
-                  title:true,
-                  body:true,
-                  createdAt:true
-               },
-               take:10,
-               skip:skipPosts
+                  username:true
+               }
             }
          },
+         take:10,
+         skip:skipPosts,
          where:{
-            id:Number(Id)
+            userId:Number(Id)
          }
       })
 
-      if(UserPosts == null){
+      if(posts == null){
          return res.status(StatusCodes.NOT_FOUND).json({
             message : "something went wrong"
          })
       }
-   
+      console.log(posts);
       return res.json({
-         userposts : UserPosts
+         posts
       })
    }catch(error){
       console.log(error);
@@ -75,12 +75,10 @@ PostsRouter.get('/yourposts/:page',authMiddleware,async (req:CustomRequest,res:R
 
    
 })
-
-
-
-PostsRouter.get('/allposts/:title/:page',authMiddleware,async (req:Request,res:Response) => {
-   const page = Number((req.params.page as string));
-   const title = req.params.title;
+PostsRouter.get('/allposts',authMiddleware,async (req:Request,res:Response) => {
+   const page = Number((req.query.count as string));
+   
+   const title = req.query.title as string;
    let SkipPosts;
    if(page != 0){
       SkipPosts = 10 * (page - 1);
@@ -89,17 +87,28 @@ PostsRouter.get('/allposts/:title/:page',authMiddleware,async (req:Request,res:R
    }
    
    try{
-      const AllPosts = await prisma.posts.findMany({
+      const posts = await prisma.posts.findMany({
          take:10,
          skip:SkipPosts,
          where:{
             title:{
                contains: title
             }
+         },
+         select:{
+            id:true,  
+            title:true,
+            body:true,
+            createdAt:true,
+            user:{
+               select:{
+                  username:true
+               }
+            }
          }
       });
       return res.json({
-         posts : AllPosts
+         posts
       })
    }catch(error){
       console.log(error);
@@ -108,6 +117,51 @@ PostsRouter.get('/allposts/:title/:page',authMiddleware,async (req:Request,res:R
       })
    }
 })
+
+
+
+PostsRouter.get('/:id',authMiddleware,async (req:Request,res:Response) => {
+   console.log(req.params.id);
+   const Id = Number(req.params.id);
+   console.log('hi');
+   console.log(Id + "osljdlfsodljflsdjx");
+   try{
+      const post = await prisma.posts.findFirst({
+         where:{
+            id:Id
+         },
+         select:{
+            id:true,  
+            title:true,
+            body:true,
+            createdAt:true,
+            user:{
+               select:{
+                  username:true
+               }
+            }
+         }
+      })
+      if(!post){
+         res.status(StatusCodes.NOT_FOUND).json({
+            message : 'no post with this id'
+         })
+      }
+      res.status(StatusCodes.OK).json({
+         post:post
+      })
+   }catch(error){
+      console.log(error);
+      res.status(StatusCodes.BAD_GATEWAY).json({
+          message : "can't connect to database"
+      })
+   }
+})
+
+
+
+
+
 
 PostsRouter.post('/',authMiddleware,async (req:CustomRequest,res:Response) => {
    const Id = Number(req.id as string);
@@ -149,7 +203,7 @@ PostsRouter.post('/',authMiddleware,async (req:CustomRequest,res:Response) => {
       });
    
       res.status(StatusCodes.OK).json({
-         title: newPost.title
+         id: newPost.id
       })
    }catch(error){
       console.log(error);

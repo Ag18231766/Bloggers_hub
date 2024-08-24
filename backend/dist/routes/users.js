@@ -136,7 +136,7 @@ UserRouter.post('/signinPassword', (req, res) => __awaiter(void 0, void 0, void 
         });
     }
 }));
-UserRouter.post('/postTags', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+UserRouter.put('/postTags', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const Id = Number(req.id);
     const { success } = TagsInput.safeParse(req.body);
     if (!success) {
@@ -152,7 +152,9 @@ UserRouter.post('/postTags', middleware_1.authMiddleware, (req, res) => __awaite
                 id: true
             },
             data: {
-                tags: tagArr
+                tags: {
+                    push: tagArr
+                }
             },
             where: {
                 id: Id

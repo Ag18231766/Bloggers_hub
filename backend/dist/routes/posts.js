@@ -36,33 +36,34 @@ PostsRouter.get('/yourposts/:page', middleware_1.authMiddleware, (req, res) => _
             message: "page entered is negative"
         });
     }
-    console.log(skipPosts);
+    console.log(skipPosts + " hi");
     try {
-        const UserPosts = yield prisma.user.findUnique({
+        const posts = yield prisma.posts.findMany({
             select: {
-                username: true,
-                posts: {
+                id: true,
+                title: true,
+                body: true,
+                createdAt: true,
+                user: {
                     select: {
-                        id: true,
-                        title: true,
-                        body: true,
-                        createdAt: true
-                    },
-                    take: 10,
-                    skip: skipPosts
+                        username: true
+                    }
                 }
             },
+            take: 10,
+            skip: skipPosts,
             where: {
-                id: Number(Id)
+                userId: Number(Id)
             }
         });
-        if (UserPosts == null) {
+        if (posts == null) {
             return res.status(StatusCodes_1.default.NOT_FOUND).json({
                 message: "something went wrong"
             });
         }
+        console.log(posts);
         return res.json({
-            userposts: UserPosts
+            posts
         });
     }
     catch (error) {
@@ -72,9 +73,9 @@ PostsRouter.get('/yourposts/:page', middleware_1.authMiddleware, (req, res) => _
         });
     }
 }));
-PostsRouter.get('/allposts/:title/:page', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const page = Number(req.params.page);
-    const title = req.params.title;
+PostsRouter.get('/allposts', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const page = Number(req.query.count);
+    const title = req.query.title;
     let SkipPosts;
     if (page != 0) {
         SkipPosts = 10 * (page - 1);
@@ -83,17 +84,66 @@ PostsRouter.get('/allposts/:title/:page', middleware_1.authMiddleware, (req, res
         SkipPosts = 0;
     }
     try {
-        const AllPosts = yield prisma.posts.findMany({
+        const posts = yield prisma.posts.findMany({
             take: 10,
             skip: SkipPosts,
             where: {
                 title: {
                     contains: title
                 }
+            },
+            select: {
+                id: true,
+                title: true,
+                body: true,
+                createdAt: true,
+                user: {
+                    select: {
+                        username: true
+                    }
+                }
             }
         });
         return res.json({
-            posts: AllPosts
+            posts
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(StatusCodes_1.default.BAD_GATEWAY).json({
+            message: "can't connect to database"
+        });
+    }
+}));
+PostsRouter.get('/:id', middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.params.id);
+    const Id = Number(req.params.id);
+    console.log('hi');
+    console.log(Id + "osljdlfsodljflsdjx");
+    try {
+        const post = yield prisma.posts.findFirst({
+            where: {
+                id: Id
+            },
+            select: {
+                id: true,
+                title: true,
+                body: true,
+                createdAt: true,
+                user: {
+                    select: {
+                        username: true
+                    }
+                }
+            }
+        });
+        if (!post) {
+            res.status(StatusCodes_1.default.NOT_FOUND).json({
+                message: 'no post with this id'
+            });
+        }
+        res.status(StatusCodes_1.default.OK).json({
+            post: post
         });
     }
     catch (error) {
@@ -140,7 +190,7 @@ PostsRouter.post('/', middleware_1.authMiddleware, (req, res) => __awaiter(void 
             }
         });
         res.status(StatusCodes_1.default.OK).json({
-            title: newPost.title
+            id: newPost.id
         });
     }
     catch (error) {

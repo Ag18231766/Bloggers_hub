@@ -119,4 +119,54 @@ TagRouter.get("/tag", middleware_1.authMiddleware, (req, res) => __awaiter(void 
         });
     }
 }));
+TagRouter.get("/:tagId/:page", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const tagId = Number(req.params.tagId);
+    const page = Number(req.params.page);
+    let skipPosts;
+    if (page > 0) {
+        skipPosts = 10 * (page - 1);
+    }
+    else if (page == 0) {
+        skipPosts = 0;
+    }
+    else {
+        return res.status(StatusCodes_1.default.BADREQUEST).json({
+            message: "page entered is negative"
+        });
+    }
+    try {
+        const posts = yield prisma.postTag.findMany({
+            where: {
+                tagId: tagId
+            },
+            select: {
+                post: {
+                    select: {
+                        id: true,
+                        title: true,
+                        body: true,
+                        createdAt: true,
+                        user: {
+                            select: {
+                                username: true
+                            }
+                        }
+                    }
+                }
+            },
+            take: 10,
+            skip: skipPosts
+        });
+        const userPosts = posts.map((t) => t.post);
+        res.json({
+            userPosts
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(StatusCodes_1.default.BAD_GATEWAY).json({
+            message: "can't connect to database"
+        });
+    }
+}));
 exports.default = TagRouter;
