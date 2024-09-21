@@ -1,10 +1,10 @@
 import StatusCodes from './StatusCodes';
 import { Request,Response,NextFunction, response } from "express";
 import jwt, { Jwt, JwtPayload } from 'jsonwebtoken';
-import JWT_PASSWORD from "./config";
+import dotenv from 'dotenv';
 import { any, object, string } from "zod";
 
-
+dotenv.config();
 
 interface UserPayload extends JwtPayload{
     id: string
@@ -33,8 +33,8 @@ const authMiddleware = (req:CustomRequest,res:Response,next:NextFunction) => {
     // console.log(token);
 
     try{
-    
-        const decoded = jwt.verify(token,JWT_PASSWORD) as UserPayload;
+        console.log(process.env.JWT_PASSWORD);
+        const decoded = jwt.verify(token,process.env.JWT_PASSWORD as string) as UserPayload;
     
         // console.log(decoded + "josd");
         if(decoded){

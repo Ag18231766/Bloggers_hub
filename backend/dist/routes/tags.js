@@ -17,12 +17,13 @@ const client_1 = require("@prisma/client");
 const middleware_1 = require("../middleware");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const StatusCodes_1 = __importDefault(require("../StatusCodes"));
-const config_1 = __importDefault(require("../config"));
+const dotenv_1 = __importDefault(require("dotenv"));
 const medium_type_1 = require("@amartya_gupta/medium_type");
 const cors_1 = __importDefault(require("cors"));
 const TagRouter = express_1.default.Router();
 TagRouter.use(express_1.default.json());
 TagRouter.use((0, cors_1.default)());
+dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 TagRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { success } = medium_type_1.AdminZod.safeParse(req.body);
@@ -47,7 +48,7 @@ TagRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, functi
                 message: "admin doesn't exist"
             });
         }
-        const token = jsonwebtoken_1.default.sign({ id: AdminExist.id }, config_1.default);
+        const token = jsonwebtoken_1.default.sign({ id: AdminExist.id }, process.env.JWT_PASSWORD);
         res.status(StatusCodes_1.default.OK).json({
             token: token
         });

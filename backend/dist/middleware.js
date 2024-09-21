@@ -6,7 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
 const StatusCodes_1 = __importDefault(require("./StatusCodes"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_1 = __importDefault(require("./config"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const authMiddleware = (req, res, next) => {
     const { authheader } = req.headers;
     // console.log(authheader);
@@ -20,7 +21,8 @@ const authMiddleware = (req, res, next) => {
     const token = authheader.split(' ')[1];
     // console.log(token);
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, config_1.default);
+        console.log(process.env.JWT_PASSWORD);
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_PASSWORD);
         // console.log(decoded + "josd");
         if (decoded) {
             req.id = decoded.id;

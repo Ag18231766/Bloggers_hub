@@ -17,7 +17,7 @@ const zod_1 = __importDefault(require("zod"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const StatusCodes_1 = __importDefault(require("../StatusCodes"));
 const client_1 = require("@prisma/client");
-const config_1 = __importDefault(require("../config"));
+const dotenv_1 = __importDefault(require("dotenv"));
 const middleware_1 = require("../middleware");
 const medium_type_1 = require("@amartya_gupta/medium_type");
 const cors_1 = __importDefault(require("cors"));
@@ -26,6 +26,7 @@ const prisma = new client_1.PrismaClient();
 // middlewares
 UserRouter.use(express_1.default.json());
 UserRouter.use((0, cors_1.default)());
+dotenv_1.default.config();
 const TagsInput = zod_1.default.object({
     tagArr: zod_1.default.array(zod_1.default.string())
 });
@@ -60,7 +61,7 @@ UserRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, funct
             }
         });
         const payload = { id: newUser.id.toString() };
-        const token = jsonwebtoken_1.default.sign(payload, config_1.default);
+        const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_PASSWORD);
         return res.json({
             token: token
         });
@@ -124,7 +125,7 @@ UserRouter.post('/signinPassword', (req, res) => __awaiter(void 0, void 0, void 
                 message: "user doesn't exist"
             });
         }
-        const token = jsonwebtoken_1.default.sign({ id: UserExist.id }, config_1.default);
+        const token = jsonwebtoken_1.default.sign({ id: UserExist.id }, process.env.JWT_PASSWORD);
         return res.json({
             token: token
         });

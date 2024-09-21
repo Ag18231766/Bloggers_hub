@@ -4,7 +4,7 @@ import { CustomRequest, authMiddleware } from '../middleware';
 import {z} from "zod";
 import jwt from "jsonwebtoken";
 import StatusCodes from '../StatusCodes';
-import JWT_PASSWORD from '../config';
+import dotenv from 'dotenv';
 import { STATUS_CODES } from 'http';
 import {AdminZod} from "@amartya_gupta/medium_type";
 import cors from 'cors';
@@ -14,6 +14,7 @@ import cors from 'cors';
 const TagRouter = express.Router();
 TagRouter.use(express.json());
 TagRouter.use(cors());
+dotenv.config();
 
 const prisma = new PrismaClient();
 
@@ -44,7 +45,7 @@ TagRouter.post("/signin",async (req:Request,res:Response) => {
                 message : "admin doesn't exist"
             })
         }
-        const token = jwt.sign({id:AdminExist.id},JWT_PASSWORD);
+        const token = jwt.sign({id:AdminExist.id},process.env.JWT_PASSWORD as string);
         res.status(StatusCodes.OK).json({
             token : token
         });

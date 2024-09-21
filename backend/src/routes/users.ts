@@ -3,7 +3,7 @@ import z, { string } from 'zod';
 import jwt from 'jsonwebtoken';
 import StatusCodes from '../StatusCodes';
 import { PrismaClient } from '@prisma/client';
-import JWT_PASSWORD from '../config';
+import dotenv from 'dotenv';
 import { CustomRequest, UserPayload, authMiddleware } from '../middleware';
 import { STATUS_CODES } from 'http';
 import {SignUpUserSchema,SignInUserSchema} from '@amartya_gupta/medium_type';
@@ -17,6 +17,7 @@ const prisma = new PrismaClient();
 // middlewares
 UserRouter.use(express.json());
 UserRouter.use(cors());
+dotenv.config();
 
 
 
@@ -81,7 +82,7 @@ UserRouter.post('/signup',async (req:Request,res:Response)=> {
          }
       })
       const payload: UserPayload = { id: newUser.id.toString() };
-      const token = jwt.sign(payload, JWT_PASSWORD);
+      const token = jwt.sign(payload, process.env.JWT_PASSWORD as string);
       
       return res.json({
          token : token
@@ -149,7 +150,7 @@ UserRouter.post('/signinPassword',async (req:Request,res:Response) => {
             message : "user doesn't exist"
          })
       }
-      const token = jwt.sign({id:UserExist.id},JWT_PASSWORD);
+      const token = jwt.sign({id:UserExist.id},process.env.JWT_PASSWORD as string);
       return res.json({
          token : token
       })
